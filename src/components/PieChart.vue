@@ -19,10 +19,10 @@ export default {
   data() {
     return {
       chartData: {
-        labels: [],
+        labels: ['Vue', 'React'],
         datasets: [
           {
-            data: [],
+            data: [10, 20, 30],
             backgroundColor: [
               '#41B883',
               '#E46651',
@@ -46,31 +46,6 @@ export default {
       loaded: false,
     };
   },
-  methods: {
-    greet() {},
-  },
-  async mounted() {
-    this.loaded = false;
-
-    try {
-      const response = await fetch(
-        'https://api2.binance.com/api/v3/ticker/24hr'
-      );
-      const data = await response.json();
-      console.log(data[0]);
-      data.forEach(element => {
-        // this.chartData.labels = [...this.chartData.labels, element.symbol];
-        // We take the volume
-        this.chartData.datasets[0].data = [
-          ...this.chartData.datasets[0].data,
-          +element.quoteVolume,
-        ];
-      });
-
-      this.loaded = true;
-    } catch (e) {
-      console.error(e);
-    }
-  },
+  methods: {},
 };
 </script>
