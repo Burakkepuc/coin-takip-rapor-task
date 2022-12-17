@@ -7,10 +7,13 @@
           {{ (btnText = dialog ? 'Add/Update' : 'Add Stock') }}
         </v-btn>
 
-        <v-btn depressed color="primary" class="btn"> Refresh </v-btn>
+        <v-btn @click="refreshPage" depressed color="primary" class="btn">
+          Refresh
+        </v-btn>
       </div>
-      <!-- Container End Point For buttons-->
+      <!-- Container End Point For Buttons-->
 
+      <!-- Modal Code Starts-->
       <v-dialog
         v-model="dialog"
         width="80%"
@@ -52,16 +55,18 @@
           </v-form>
         </v-card>
       </v-dialog>
+      <!-- Modal Code Ends-->
 
+      <!-- Horizontal Line-->
       <hr class="line" />
 
-      <!-- List Part -->
+      <!--Mainpage List Starts -->
       <v-col cols="12" sm="5" height="1000px">
         <v-container height="1000px">
           <v-list-item
             class="border"
             v-for="(label, index) in chartData.labels"
-            :key="label"
+            :key="index++"
           >
             <v-row>
               <v-list-item-content d-flex>
@@ -72,12 +77,16 @@
                   }}</span></v-list-item-title
                 >
               </v-list-item-content>
-              <v-btn class="btn" dark md color="error"> Update </v-btn>
+              <v-btn class="btn" dark md color="error" @click="deleteHandle">
+                Delete
+              </v-btn>
             </v-row>
           </v-list-item>
         </v-container>
       </v-col>
-      <!-- List Part end-->
+      <!-- Mainpage List  End-->
+
+      <!-- Vertical Line-->
 
       <hr class="vertical" />
 
@@ -87,6 +96,7 @@
           :data="this.chartData.datasets[0].data"
           :bgColor="this.chartData.datasets[0].backgroundColor"
           :labels="this.chartData.labels"
+          :key="this.chartData.labels.length"
         />
       </v-col>
       <!-- Chart part end-->
@@ -119,6 +129,16 @@ export default {
         +price,
       ];
     },
+    deleteHandle() {
+      this.chartData.labels.pop();
+      this.chartData.datasets[0].data.pop();
+      this.chartData.datasets[0].backgroundColor.pop();
+    },
+    refreshPage() {
+      setTimeout(function () {
+        location.reload();
+      }, 100);
+    },
   },
 
   data: () => ({
@@ -140,7 +160,7 @@ export default {
             '#DD1B16',
             '#DD26FF',
             '#9ab973',
-            '#ff4c4c',
+            `#${Math.floor(Math.random() * 16777215).toString(16)}`, // Random color
           ],
         },
       ],
@@ -165,13 +185,10 @@ export default {
       );
       const data = await response.json();
       await data.forEach(element => {
-        // console.log(element.symbol, element.lastPrice);
         this.chartData.symbols = [...this.chartData.symbols, element.symbol];
-        // We take the volume
         this.chartData.price = [...this.chartData.price, +element.lastPrice];
       });
 
-      // console.log(this.chartData.symbols);
       this.loaded = true;
     } catch (e) {
       console.error(e);

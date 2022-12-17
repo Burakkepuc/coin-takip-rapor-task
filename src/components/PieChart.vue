@@ -1,10 +1,11 @@
 <template>
   <Pie
-    v-if="loaded"
+    v-if="loaded && this.chartData.labels.length !== 0"
     id="my-chart-id"
     :options="chartOptions"
     :data="chartData"
   />
+  <Pie v-else :options="chartOptions" :data="emptyChartData"></Pie>
 </template>
 
 <script>
@@ -20,11 +21,20 @@ export default {
   data() {
     return {
       chartData: {
-        labels: this.labels,
+        labels: [...this.labels],
         datasets: [
           {
-            data: this.data,
-            backgroundColor: this.bgColor,
+            data: [...this.data],
+            backgroundColor: [...this.bgColor],
+          },
+        ],
+      },
+      emptyChartData: {
+        labels: [],
+        datasets: [
+          {
+            data: [0.01],
+            backgroundColor: ['#999797'],
           },
         ],
       },
@@ -39,6 +49,5 @@ export default {
       loaded: true,
     };
   },
-  methods: {},
 };
 </script>
