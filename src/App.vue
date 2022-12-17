@@ -28,11 +28,11 @@
 
             <v-row>
               <v-list-item
-                v-for="pair in filterBy(pairs, search)"
+                v-for="(pair, index) in filterBy(pairs, search)"
                 :key="pair.symbol"
               >
                 <v-list-item-content>
-                  <v-list-item-title
+                  <v-list-item-title ref="refWord"
                     >{{ pair.symbol }} - {{ pair.price }}</v-list-item-title
                   >
                 </v-list-item-content>
@@ -46,36 +46,48 @@
                   width="50px"
                   height="50px"
                 />
-                <v-btn class="btn" dark md color="success"> Add </v-btn>
+                <AddBtn @click-event="searchHandle(index)" />
               </v-list-item>
             </v-row>
-
-            <!-- </div> -->
           </v-form>
         </v-card>
       </v-dialog>
 
       <hr class="line" />
 
-      <!-- Form Part -->
+      <!-- List Part -->
       <v-col cols="12" sm="5" height="1000px">
         <v-container height="1000px">
-          eligendi cumque fuga nostrum hic tenetur pariatur enim quaerat saepe,
-          quam odio iste doloribus sapiente modi facilis ea. Eveniet libero
-          totam deserunt nostrum hic, perferendis ea magni, molestias adipisci
-          nemo quis et aliquid maiores nesciunt dicta earum quod rerum ut. Saepe
-          quisquam ipsa omnis aspernatur quia facilis laborum eos pariatur unde,
-          itaque doloribus, dolor expedita corporis ducimus magnam ratione optio
-          suscipit tenetur non neque dolorem? Ullam porro et id asperiores fuga
-          perspiciatis aut numquam, voluptates eos labore vitae earum corrupti.
+          <v-list-item
+            class="border"
+            v-for="(label, index) in chartData.labels"
+            :key="label"
+          >
+            <v-row>
+              <v-list-item-content d-flex>
+                <v-list-item-title
+                  >{{ label }}
+                  <span>{{
+                    chartData.datasets[0].data[index]
+                  }}</span></v-list-item-title
+                >
+              </v-list-item-content>
+              <v-btn class="btn" dark md color="error"> Update </v-btn>
+            </v-row>
+          </v-list-item>
         </v-container>
       </v-col>
-      <!-- Form Part end-->
+      <!-- List Part end-->
+
       <hr class="vertical" />
 
       <!-- Chart part -->
       <v-col cols="12" sm="5">
-        <PieChart />
+        <PieChart
+          :data="this.chartData.datasets[0].data"
+          :bgColor="this.chartData.datasets[0].backgroundColor"
+          :labels="this.chartData.labels"
+        />
       </v-col>
       <!-- Chart part end-->
     </v-row>
@@ -85,16 +97,27 @@
 <script>
 import PieChart from './components/PieChart';
 import Vue2Filters from 'vue2-filters';
+import AddBtn from './components/AddBtn.vue';
+import Modal from './components/Modal.vue';
 
 export default {
   name: 'App',
   mixins: [Vue2Filters.mixin],
 
-  components: {PieChart},
+  components: {PieChart, AddBtn, Modal},
   methods: {
     toggleButton() {
       this.dialog = !this.dialog;
-      this.btnText = this.dialog ? 'Add / Update' : 'Add Stock';
+      // this.btnText = this.dialog ? 'Add / Update' : 'Add Stock';
+    },
+    searchHandle(index) {
+      const [sym, price] = this.$refs.refWord[index].innerText.split('-');
+      this.symbol = sym;
+      this.chartData.labels = [...this.chartData.labels, sym];
+      this.chartData.datasets[0].data = [
+        ...this.chartData.datasets[0].data,
+        +price,
+      ];
     },
   },
 
@@ -104,8 +127,23 @@ export default {
     btnText: 'Add Stock',
     numberValue: 1,
     chartData: {
+      labels: ['CHM', 'BBM', 'LLJTRY'],
       symbols: [],
       price: [],
+      datasets: [
+        {
+          data: [0.035, 0.26, 0.022],
+          backgroundColor: [
+            '#41B883',
+            '#E46651',
+            '#20AB2E',
+            '#DD1B16',
+            '#DD26FF',
+            '#9ab973',
+            '#ff4c4c',
+          ],
+        },
+      ],
     },
   }),
   computed: {
@@ -118,7 +156,7 @@ export default {
       });
     },
   },
-  async mounted() {
+  async created() {
     this.loaded = false;
 
     try {
@@ -126,7 +164,7 @@ export default {
         'https://api2.binance.com/api/v3/ticker/24hr'
       );
       const data = await response.json();
-      data.forEach(element => {
+      await data.forEach(element => {
         // console.log(element.symbol, element.lastPrice);
         this.chartData.symbols = [...this.chartData.symbols, element.symbol];
         // We take the volume
@@ -153,5 +191,14 @@ export default {
 hr.vertical {
   height: 80%;
   margin: 3% auto;
+}
+.scroller {
+  height: 100%;
+}
+.border {
+  border: 1px solid rgba(0, 0, 0, 0.123);
+  padding: 5px 20px;
+  margin: 10px 0;
+  border-radius: 10px;
 }
 </style>

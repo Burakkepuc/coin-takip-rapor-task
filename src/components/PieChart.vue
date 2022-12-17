@@ -16,22 +16,15 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 export default {
   name: 'PieChart',
   components: {Pie},
+  props: ['data', 'bgColor', 'labels'],
   data() {
     return {
       chartData: {
-        labels: ['Vue', 'React'],
+        labels: this.labels,
         datasets: [
           {
-            data: [10, 20, 30],
-            backgroundColor: [
-              '#41B883',
-              '#E46651',
-              '#20AB2E',
-              '#DD1B16',
-              '#DD26FF',
-              '#9ab973',
-              '#ff4c4c',
-            ],
+            data: this.data,
+            backgroundColor: this.bgColor,
           },
         ],
       },
@@ -43,7 +36,7 @@ export default {
           },
         },
       },
-      loaded: false,
+      loaded: true,
     };
   },
   methods: {},
