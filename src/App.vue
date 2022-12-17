@@ -108,13 +108,12 @@
 import PieChart from './components/PieChart';
 import Vue2Filters from 'vue2-filters';
 import AddBtn from './components/AddBtn.vue';
-import Modal from './components/Modal.vue';
 
 export default {
   name: 'App',
   mixins: [Vue2Filters.mixin],
 
-  components: {PieChart, AddBtn, Modal},
+  components: {PieChart, AddBtn},
   methods: {
     toggleButton() {
       this.dialog = !this.dialog;
@@ -184,7 +183,7 @@ export default {
         'https://api2.binance.com/api/v3/ticker/24hr'
       );
       const data = await response.json();
-      await data.forEach(element => {
+      data.forEach(element => {
         this.chartData.symbols = [...this.chartData.symbols, element.symbol];
         this.chartData.price = [...this.chartData.price, +element.lastPrice];
       });
