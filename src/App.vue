@@ -183,7 +183,8 @@ export default {
         'https://api2.binance.com/api/v3/ticker/24hr'
       );
       const data = await response.json();
-      data.forEach(element => {
+      // Get first 100 of data
+      data.slice(0, 100).forEach(element => {
         this.chartData.symbols = [...this.chartData.symbols, element.symbol];
         this.chartData.price = [...this.chartData.price, +element.lastPrice];
       });
